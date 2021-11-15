@@ -60,6 +60,13 @@ postgres=# select * from pg_ls_waldir();
 </details>
 
 > **_NOTE:_** При включении асинхронного режима tps вырос почти в 2 раза в следствии отсутствия ожидания локального сброса WAL на диск
+> 
+> :warning: изменение: ALTER SYSTEM SET synchronous_commit = off; 
+> 
+> Требуется рестарт кластера
+> 
+> :warning: просмотр: show synchronous_commit;
+
 <details>
 <summary>pg_banch синхронно:</summary>
 
