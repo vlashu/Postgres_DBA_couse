@@ -220,7 +220,7 @@ tps = 1056.005230 (including connections establishing)
 
 
 
-Включение контрольных сумм на кластере
+#### Включение контрольных сумм на кластере:
 
     postgres=# show data_checksums;
      data_checksums 
