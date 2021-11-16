@@ -244,6 +244,8 @@ tps = 764.575541 (excluding connections establishing)
 </details>
 
 <details>
+ 
+ ```console
 <summary>Выполнение pg_banch:</summary>
 progress: 10.0 s, 893.7 tps, lat 8.923 ms stddev 7.253
 progress: 20.0 s, 900.1 tps, lat 8.887 ms stddev 6.939
@@ -316,12 +318,11 @@ latency average = 11.498 ms
 latency stddev = 17.938 ms
 tps = 695.643160 (including connections establishing)
 tps = 695.646811 (excluding connections establishing)
-```console
-  
 ```
 </details>
   
- ### Пассивные настройки Autovacuum:
+
+### Пассивные настройки Autovacuum:
   
 <details>
 <summary>Сет параметров:</summary>
