@@ -429,6 +429,6 @@ tps = 747.608314 (excluding connections establishing)
 ```
 </details>  
 
-### Результирующий график
+### Результирующий график:
  
 ![image](https://user-images.githubusercontent.com/93687317/142018166-5cf5896a-5125-40fc-9f1a-fe203a2bf8b7.png)
