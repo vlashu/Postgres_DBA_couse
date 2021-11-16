@@ -244,6 +244,7 @@ tps = 764.575541 (excluding connections establishing)
 </details>
 
 <details>
+<summary>Выполнение pg_banch:</summary>
  
  ```console
 <summary>Выполнение pg_banch:</summary>
