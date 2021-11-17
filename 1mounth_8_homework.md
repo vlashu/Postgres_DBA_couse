@@ -79,3 +79,27 @@ test=# select * from pg_locks;
          |          |                               | Activity        | WalWriterMain       |                     |             |              |                                                  | walwriter
 (9 rows)
 ```
+
+
+LOG
+```console
+2021-11-17 21:33:29.637 UTC [20592] postgres@test LOG:  process 20592 still waiting for ShareLock on transaction 491 after 200.210 ms
+2021-11-17 21:33:29.637 UTC [20592] postgres@test DETAIL:  Process holding the lock: 20590. Wait queue: 20592.
+2021-11-17 21:33:29.637 UTC [20592] postgres@test CONTEXT:  while updating tuple (0,2) in relation "test"
+2021-11-17 21:33:29.637 UTC [20592] postgres@test STATEMENT:  UPDATE test SET name = 'updated_2' WHERE id = 2;
+2021-11-17 21:33:34.555 UTC [20593] postgres@test LOG:  process 20593 still waiting for ExclusiveLock on tuple (0,2) of relation 16385 of database 16384 after 200.223 ms
+2021-11-17 21:33:34.555 UTC [20593] postgres@test DETAIL:  Process holding the lock: 20592. Wait queue: 20593.
+2021-11-17 21:33:34.555 UTC [20593] postgres@test STATEMENT:  UPDATE test SET name = 'updated_3' WHERE id = 2;
+2021-11-17 21:52:18.588 UTC [20592] postgres@test LOG:  process 20592 acquired ShareLock on transaction 491 after 1129150.774 ms
+2021-11-17 21:52:18.588 UTC [20592] postgres@test CONTEXT:  while updating tuple (0,2) in relation "test"
+2021-11-17 21:52:18.588 UTC [20592] postgres@test STATEMENT:  UPDATE test SET name = 'updated_2' WHERE id = 2;
+2021-11-17 21:52:18.588 UTC [20593] postgres@test LOG:  process 20593 acquired ExclusiveLock on tuple (0,2) of relation 16385 of database 16384 after 1124233.003 ms
+2021-11-17 21:52:18.588 UTC [20593] postgres@test STATEMENT:  UPDATE test SET name = 'updated_3' WHERE id = 2;
+2021-11-17 21:52:18.789 UTC [20593] postgres@test LOG:  process 20593 still waiting for ShareLock on transaction 492 after 200.204 ms
+2021-11-17 21:52:18.789 UTC [20593] postgres@test DETAIL:  Process holding the lock: 20592. Wait queue: 20593.
+2021-11-17 21:52:18.789 UTC [20593] postgres@test CONTEXT:  while rechecking updated tuple (0,6) in relation "test"
+2021-11-17 21:52:18.789 UTC [20593] postgres@test STATEMENT:  UPDATE test SET name = 'updated_3' WHERE id = 2;
+2021-11-17 21:52:25.725 UTC [20593] postgres@test LOG:  process 20593 acquired ShareLock on transaction 492 after 7136.679 ms
+2021-11-17 21:52:25.725 UTC [20593] postgres@test CONTEXT:  while rechecking updated tuple (0,6) in relation "test"
+2021-11-17 21:52:25.725 UTC [20593] postgres@test STATEMENT:  UPDATE test SET name = 'updated_3' WHERE id = 2;
+```
