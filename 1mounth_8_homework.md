@@ -1,27 +1,16 @@
 
-> :warning: запрос для удобства мониторинга
->```sql
->select 
->    pgclass.relname as "Таблица",
->    pdb.datname as "БД",
->    pg_locks.pid as "Process ID",
->    pg_locks.transactionid as "Транзакция",
->    pg_locks.mode as "Блокировка",
->    pg_locks.granted as "Блокировка получена",
->    pg_locks.fastpath as "Блокировка по короткому пути"
->from 
->    pg_locks
->left join pg_database as pdb on pg_locks.database = pdb.oid
->left join pg_class as pgclass on pg_locks.relation = pgclass.oid
->order by pg_locks.pid
->;
->```
+> :warning: Параметры, выдавливающие в лог информацию о блокировка более 200 мс (требуется перезагрузка кластера)
+>
+>log_lock_waits = on - нужно ли фиксировать в журнале события, когда сеанс ожидает получения блокировки дольше, чем указано в deadlock_timeout
+>
+>deadlock_timeout = 200 - время ожидания блокировки (в миллисекундах), по истечении которого будет выполняться проверка состояния взаимоблокировки
 
-log_lock_waits = on
-deadlock_timeout = 200
 
-test=# select * from pg_locks;
-
+### Просмотр состояния на момент запуска
+```sql
+select * from pg_locks;
+```
+```console
   locktype  | database | relation | page | tuple | virtualxid | transactionid | classid | objid | objsubid | virtualtransaction |  pid  |      mode       | granted | fastpath 
 ------------+----------+----------+------+-------+------------+---------------+---------+-------+----------+--------------------+-------+-----------------+---------+----------
  relation   |    16384 |    12141 |      |       |            |               |         |       |          | 7/2                | 20598 | AccessShareLock | t       | t
@@ -30,10 +19,13 @@ test=# select * from pg_locks;
  virtualxid |          |          |      |       | 4/4        |               |         |       |          | 4/4                | 20592 | ExclusiveLock   | t       | t
  virtualxid |          |          |      |       | 3/8        |               |         |       |          | 3/8                | 20590 | ExclusiveLock   | t       | t
 (5 rows)
+```
 
-
-3 сеанса UPDATE
-
+### Состояние с тремя сеансами UPDATE (незавершенные транзакции)
+```sql
+select * from pg_locks;
+```
+```console
    locktype    | database | relation | page | tuple | virtualxid | transactionid | classid | objid | objsubid | virtualtransaction |  pid  |       mode       | granted | fastpath 
 ---------------+----------+----------+------+-------+------------+---------------+---------+-------+----------+--------------------+-------+------------------+---------+----------
  relation      |    16384 |    12141 |      |       |            |               |         |       |          | 7/3                | 20598 | AccessShareLock  | t       | t
@@ -51,9 +43,21 @@ test=# select * from pg_locks;
  tuple         |    16384 |    16385 |    0 |     2 |            |               |         |       |          | 4/4                | 20592 | ExclusiveLock    | t       | f
  transactionid |          |          |      |       |            |           493 |         |       |          | 5/2                | 20593 | ExclusiveLock    | t       | f
 (14 rows)
-
-
-Журнал:
+```
+```sql
+select
+    datname,
+    usename,
+    xact_start,        
+    wait_event_type,
+    wait_event,     
+    state,  
+    backend_xid,
+    backend_xmin,
+    query,             
+    backend_type
+from pg_stat_activity;
+```
 ```console
  datname | usename  |          xact_start           | wait_event_type |     wait_event      |        state        | backend_xid | backend_xmin |                      query                       |         backend_type         
 ---------+----------+-------------------------------+-----------------+---------------------+---------------------+-------------+--------------+--------------------------------------------------+------------------------------
