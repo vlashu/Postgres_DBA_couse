@@ -54,7 +54,7 @@ test=# select * from pg_locks;
 
 
 Журнал:
-
+```console
  datname | usename  |          xact_start           | wait_event_type |     wait_event      |        state        | backend_xid | backend_xmin |                      query                       |         backend_type         
 ---------+----------+-------------------------------+-----------------+---------------------+---------------------+-------------+--------------+--------------------------------------------------+------------------------------
          |          |                               | Activity        | AutoVacuumMain      |                     |             |              |                                                  | autovacuum launcher
@@ -78,3 +78,4 @@ test=# select * from pg_locks;
          |          |                               | Activity        | CheckpointerMain    |                     |             |              |                                                  | checkpointer
          |          |                               | Activity        | WalWriterMain       |                     |             |              |                                                  | walwriter
 (9 rows)
+```
