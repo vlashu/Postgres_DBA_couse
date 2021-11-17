@@ -20,17 +20,61 @@
 log_lock_waits = on
 deadlock_timeout = 200
 
+test=# select * from pg_locks;
 
-              Таблица              |  БД  | Process ID |    Блокировка    | Блокировка получена | Блокировка по короткому пути 
------------------------------------+------+------------+------------------+---------------------+------------------------------
- test                              | test |      20381 | RowExclusiveLock | t                   | t
- pg_class_tblspc_relfilenode_index | test |      20391 | AccessShareLock  | t                   | t
- pg_class_relname_nsp_index        | test |      20391 | AccessShareLock  | t                   | t
- pg_class_oid_index                | test |      20391 | AccessShareLock  | t                   | t
- pg_class                          | test |      20391 | AccessShareLock  | t                   | t
- pg_locks                          | test |      20391 | AccessShareLock  | t                   | t
- test                              | test |      20382 | RowExclusiveLock | t                   | t
- test                              | test |      20379 | RowExclusiveLock | t                   | t
- test                              | test |      20382 | ExclusiveLock    | f                   | f
- test                              | test |      20381 | ExclusiveLock    | t                   | f
-(10 rows)
+  locktype  | database | relation | page | tuple | virtualxid | transactionid | classid | objid | objsubid | virtualtransaction |  pid  |      mode       | granted | fastpath 
+------------+----------+----------+------+-------+------------+---------------+---------+-------+----------+--------------------+-------+-----------------+---------+----------
+ relation   |    16384 |    12141 |      |       |            |               |         |       |          | 7/2                | 20598 | AccessShareLock | t       | t
+ virtualxid |          |          |      |       | 7/2        |               |         |       |          | 7/2                | 20598 | ExclusiveLock   | t       | t
+ virtualxid |          |          |      |       | 5/2        |               |         |       |          | 5/2                | 20593 | ExclusiveLock   | t       | t
+ virtualxid |          |          |      |       | 4/4        |               |         |       |          | 4/4                | 20592 | ExclusiveLock   | t       | t
+ virtualxid |          |          |      |       | 3/8        |               |         |       |          | 3/8                | 20590 | ExclusiveLock   | t       | t
+(5 rows)
+
+
+3 сеанса UPDATE
+
+   locktype    | database | relation | page | tuple | virtualxid | transactionid | classid | objid | objsubid | virtualtransaction |  pid  |       mode       | granted | fastpath 
+---------------+----------+----------+------+-------+------------+---------------+---------+-------+----------+--------------------+-------+------------------+---------+----------
+ relation      |    16384 |    12141 |      |       |            |               |         |       |          | 7/3                | 20598 | AccessShareLock  | t       | t
+ virtualxid    |          |          |      |       | 7/3        |               |         |       |          | 7/3                | 20598 | ExclusiveLock    | t       | t
+ relation      |    16384 |    16385 |      |       |            |               |         |       |          | 5/2                | 20593 | RowExclusiveLock | t       | t
+ virtualxid    |          |          |      |       | 5/2        |               |         |       |          | 5/2                | 20593 | ExclusiveLock    | t       | t
+ relation      |    16384 |    16385 |      |       |            |               |         |       |          | 4/4                | 20592 | RowExclusiveLock | t       | t
+ virtualxid    |          |          |      |       | 4/4        |               |         |       |          | 4/4                | 20592 | ExclusiveLock    | t       | t
+ relation      |    16384 |    16385 |      |       |            |               |         |       |          | 3/8                | 20590 | RowExclusiveLock | t       | t
+ virtualxid    |          |          |      |       | 3/8        |               |         |       |          | 3/8                | 20590 | ExclusiveLock    | t       | t
+ transactionid |          |          |      |       |            |           491 |         |       |          | 4/4                | 20592 | ShareLock        | f       | f
+ transactionid |          |          |      |       |            |           491 |         |       |          | 3/8                | 20590 | ExclusiveLock    | t       | f
+ tuple         |    16384 |    16385 |    0 |     2 |            |               |         |       |          | 5/2                | 20593 | ExclusiveLock    | f       | f
+ transactionid |          |          |      |       |            |           492 |         |       |          | 4/4                | 20592 | ExclusiveLock    | t       | f
+ tuple         |    16384 |    16385 |    0 |     2 |            |               |         |       |          | 4/4                | 20592 | ExclusiveLock    | t       | f
+ transactionid |          |          |      |       |            |           493 |         |       |          | 5/2                | 20593 | ExclusiveLock    | t       | f
+(14 rows)
+
+
+Журнал:
+
+ datname | usename  |          xact_start           | wait_event_type |     wait_event      |        state        | backend_xid | backend_xmin |                      query                       |         backend_type         
+---------+----------+-------------------------------+-----------------+---------------------+---------------------+-------------+--------------+--------------------------------------------------+------------------------------
+         |          |                               | Activity        | AutoVacuumMain      |                     |             |              |                                                  | autovacuum launcher
+         | postgres |                               | Activity        | LogicalLauncherMain |                     |             |              |                                                  | logical replication launcher
+ test    | postgres | 2021-11-17 21:31:39.540788+00 | Client          | ClientRead          | idle in transaction |         491 |              | UPDATE test SET name = 'updated_1' WHERE id = 2; | client backend
+ test    | postgres | 2021-11-17 21:31:45.625634+00 | Lock            | transactionid       | active              |         492 |          491 | UPDATE test SET name = 'updated_2' WHERE id = 2; | client backend
+ test    | postgres | 2021-11-17 21:31:50.75125+00  | Lock            | tuple               | active              |         493 |          491 | UPDATE test SET name = 'updated_3' WHERE id = 2; | client backend
+ test    | postgres | 2021-11-17 21:48:27.301815+00 |                 |                     | active              |             |          491 | select                                          +| client backend
+         |          |                               |                 |                     |                     |             |              | datname,                                        +| 
+         |          |                               |                 |                     |                     |             |              | usename,                                        +| 
+         |          |                               |                 |                     |                     |             |              | xact_start,                                     +| 
+         |          |                               |                 |                     |                     |             |              | wait_event_type,                                +| 
+         |          |                               |                 |                     |                     |             |              | wait_event,                                     +| 
+         |          |                               |                 |                     |                     |             |              | state,                                          +| 
+         |          |                               |                 |                     |                     |             |              | backend_xid,                                    +| 
+         |          |                               |                 |                     |                     |             |              | backend_xmin,                                   +| 
+         |          |                               |                 |                     |                     |             |              | query,                                          +| 
+         |          |                               |                 |                     |                     |             |              | backend_type                                    +| 
+         |          |                               |                 |                     |                     |             |              | from pg_stat_activity;                           | 
+         |          |                               | Activity        | BgWriterHibernate   |                     |             |              |                                                  | background writer
+         |          |                               | Activity        | CheckpointerMain    |                     |             |              |                                                  | checkpointer
+         |          |                               | Activity        | WalWriterMain       |                     |             |              |                                                  | walwriter
+(9 rows)
