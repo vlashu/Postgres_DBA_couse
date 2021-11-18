@@ -116,6 +116,7 @@ from pg_stat_activity;
  https://postgrespro.ru/docs/postgresql/10/explicit-locking#LOCKING-TABLES
   
 </details>
+
 ---
 
 
