@@ -26,7 +26,7 @@ select * from pg_locks;
 ```
 </details>
 
-  
+---
   
 ### Состояние с тремя сеансами UPDATE (незавершенные транзакции)
 
@@ -96,14 +96,27 @@ from pg_stat_activity;
 ```
 </details>
 
+
+---
+
+### Блокировки
+
  AccessShareLock - Конфликтует только с режимом блокировки ACCESS EXCLUSIVE. (Данную блокировку вешает любой select)
  
  ExclusiveLock - Параллельно с транзакцией, получившей блокировку в этом режиме, допускается только чтение таблицы
  
- RowExclusiveLock - Параллельно с транзакцией, получившей блокировку в этом режиме, допускается только чтение таблицы
+ RowExclusiveLock - Заблокированна строка, идет операция записи или изменения
  
- ShareLock - Защищает таблицу от параллельного изменения данных  
-
+ ShareLock - Защищает таблицу от параллельного изменения данных (транзакция ожидает фиксацию (коммита)/отката другой транзакции, прежде чем она сможет продолжить)  
+ 
+<details>
+<summary>На всякий случай для себя</summary>
+  
+ ![изображение](https://user-images.githubusercontent.com/93687317/142508292-15dd69a1-ea12-4653-982d-bc2ac9e754fd.png)
+ https://postgrespro.ru/docs/postgresql/10/explicit-locking#LOCKING-TABLES
+  
+</details>
+---
 
 
 > **_NOTE:_** При чтении логов можно отследить факт блокировки и момент получения управления, однако по дефолту (и на проде чаще всего) данные параметр отключен (log_lock_waits), а параметр deadlock_timeout чаще всего задран для снижения нагрузки
@@ -132,6 +145,8 @@ from pg_stat_activity;
 2021-11-17 21:52:25.725 UTC [20593] postgres@test CONTEXT:  while rechecking updated tuple (0,6) in relation "test"
 2021-11-17 21:52:25.725 UTC [20593] postgres@test STATEMENT:  UPDATE test SET name = 'updated_3' WHERE id = 2;
 ```
+  
+https://www.endpointdev.com/blog/2014/11/dear-postgresql-where-are-my-logs/
 </details>
 
 > **_NOTE:_** Могут ли две транзакции, выполняющие единственную команду UPDATE одной и той же таблицы (без where), заблокировать друг друга? Да, могут
