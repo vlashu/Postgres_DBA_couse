@@ -125,10 +125,9 @@ from pg_stat_activity;
 ```
 </details>
 
-> **_NOTE:_** При чтении логов можно отследить факт блокировки и момент получения управления, однако по дефолту (и на проде чаще всего) данные параметр отключен (log_lock_waits), а параметр deadlock_timeout чаще всего задран для снижения нагрузки
-
+> **_NOTE:_** Могут ли две транзакции, выполняющие единственную команду UPDATE одной и той же таблицы (без where), заблокировать друг друга? Да, могут
 <details>
-<summary>LOG</summary>
+<summary>pg_locks</summary>
   
 ```console
    locktype    | database | relation | page | tuple | virtualxid | transactionid | classid | objid | objsubid | virtualtransaction |  pid  |       mode       | granted | fastpath 
