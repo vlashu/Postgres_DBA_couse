@@ -125,7 +125,11 @@ from pg_stat_activity;
 ```
 </details>
 
+> **_NOTE:_** При чтении логов можно отследить факт блокировки и момент получения управления, однако по дефолту (и на проде чаще всего) данные параметр отключен (log_lock_waits), а параметр deadlock_timeout чаще всего задран для снижения нагрузки
 
+<details>
+<summary>LOG</summary>
+  
 ```console
    locktype    | database | relation | page | tuple | virtualxid | transactionid | classid | objid | objsubid | virtualtransaction |  pid  |       mode       | granted | fastpath 
 ---------------+----------+----------+------+-------+------------+---------------+---------+-------+----------+--------------------+-------+------------------+---------+----------
@@ -141,3 +145,4 @@ from pg_stat_activity;
  tuple         |    16384 |    16385 |    0 |     1 |            |               |         |       |          | 3/5755             | 25562 | ExclusiveLock    | t       | f
 (10 rows)
 ```
+</details>
