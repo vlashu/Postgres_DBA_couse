@@ -7,6 +7,10 @@
 
 
 ### Просмотр состояния на момент запуска
+
+<details>
+<summary>Просмотр состояния на момент запуска</summary>
+  
 ```sql
 select * from pg_locks;
 ```
@@ -20,8 +24,15 @@ select * from pg_locks;
  virtualxid |          |          |      |       | 3/8        |               |         |       |          | 3/8                | 20590 | ExclusiveLock   | t       | t
 (5 rows)
 ```
+</details>
 
+  
+  
 ### Состояние с тремя сеансами UPDATE (незавершенные транзакции)
+
+<details>
+<summary>pg_locks и pg_stat_activity</summary>
+  
 ```sql
 select * from pg_locks;
 ```
@@ -83,9 +94,14 @@ from pg_stat_activity;
          |          |                               | Activity        | WalWriterMain       |                     |             |              |                                                  | walwriter
 (9 rows)
 ```
+</details>
 
 
-LOG
+> **_NOTE:_** При чтении логов можно отследить факт блокировки и момент получения управления, однако по дефолту (и на проде чаще всего) данные параметр отключен (log_lock_waits), а параметр deadlock_timeout чаще всего задран для снижения нагрузки
+
+<details>
+<summary>LOG</summary>
+  
 ```console
 2021-11-17 21:33:29.637 UTC [20592] postgres@test LOG:  process 20592 still waiting for ShareLock on transaction 491 after 200.210 ms
 2021-11-17 21:33:29.637 UTC [20592] postgres@test DETAIL:  Process holding the lock: 20590. Wait queue: 20592.
@@ -107,6 +123,8 @@ LOG
 2021-11-17 21:52:25.725 UTC [20593] postgres@test CONTEXT:  while rechecking updated tuple (0,6) in relation "test"
 2021-11-17 21:52:25.725 UTC [20593] postgres@test STATEMENT:  UPDATE test SET name = 'updated_3' WHERE id = 2;
 ```
+</details>
+
 
 ```console
    locktype    | database | relation | page | tuple | virtualxid | transactionid | classid | objid | objsubid | virtualtransaction |  pid  |       mode       | granted | fastpath 
