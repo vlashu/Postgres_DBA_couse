@@ -107,3 +107,19 @@ LOG
 2021-11-17 21:52:25.725 UTC [20593] postgres@test CONTEXT:  while rechecking updated tuple (0,6) in relation "test"
 2021-11-17 21:52:25.725 UTC [20593] postgres@test STATEMENT:  UPDATE test SET name = 'updated_3' WHERE id = 2;
 ```
+
+```console
+   locktype    | database | relation | page | tuple | virtualxid | transactionid | classid | objid | objsubid | virtualtransaction |  pid  |       mode       | granted | fastpath 
+---------------+----------+----------+------+-------+------------+---------------+---------+-------+----------+--------------------+-------+------------------+---------+----------
+ relation      |    16384 |    16385 |      |       |            |               |         |       |          | 3/5755             | 25562 | RowExclusiveLock | t       | t
+ virtualxid    |          |          |      |       | 3/5755     |               |         |       |          | 3/5755             | 25562 | ExclusiveLock    | t       | t
+ relation      |    13414 |    12141 |      |       |            |               |         |       |          | 4/27               | 25575 | AccessShareLock  | t       | t
+ virtualxid    |          |          |      |       | 4/27       |               |         |       |          | 4/27               | 25575 | ExclusiveLock    | t       | t
+ relation      |    16384 |    16385 |      |       |            |               |         |       |          | 5/8                | 25561 | RowExclusiveLock | t       | t
+ virtualxid    |          |          |      |       | 5/8        |               |         |       |          | 5/8                | 25561 | ExclusiveLock    | t       | t
+ transactionid |          |          |      |       |            |           497 |         |       |          | 5/8                | 25561 | ExclusiveLock    | t       | f
+ transactionid |          |          |      |       |            |           497 |         |       |          | 3/5755             | 25562 | ShareLock        | f       | f
+ transactionid |          |          |      |       |            |           498 |         |       |          | 3/5755             | 25562 | ExclusiveLock    | t       | f
+ tuple         |    16384 |    16385 |    0 |     1 |            |               |         |       |          | 3/5755             | 25562 | ExclusiveLock    | t       | f
+(10 rows)
+```
