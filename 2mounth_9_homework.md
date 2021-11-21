@@ -748,7 +748,7 @@ full_page_writes = off                  # отключаем запись цел
 fsync = off                             # не следим за записью на диск
 synchronous_commit = off                # асинхронный коммит, не ждем подтверждения
 checkpoint_timeout = 1d                 # контрольная точка раз в сутки
-checkpoint_completion_target = 1        # Коэффициент между контрольными точками, гарантируем 1 день
+checkpoint_completion_target = 1        # размазываем запись на весь период до следующей контрольной точки
 checkpoint_flush_after = 0              # Отключаем управление отложенной записью
 checkpoint_warning = 0                  # Отключаем логирование 
 track_activities = off                  # Отключаем сбор статистики
@@ -1093,3 +1093,7 @@ Threads fairness:
     execution time (avg/stddev):   300.6254/0.62
 ```
 </details>
+
+### График
+
+![изображение](https://user-images.githubusercontent.com/93687317/142770100-d2b1e8f0-3d65-4361-8c3e-2a76fecf061f.png)
