@@ -12,7 +12,7 @@
 >
 > :warning: ./tpcc.lua --pgsql-user=postgres --pgsql-db=sbtest --time=300 --threads=36 --report-interval=1 --tables=5 --scale=5 --pgsql-host='127.0.0.1' --db-driver=pgsql run
 >
-> Параметры запуска были изменены для не слишком большого размера БД, т.к.:
+> Параметры запуска были изменены для не слишком большого размера БД (2,6 GB), т.к.:
 >
 > **"As a rough estimation, 100 warehouses with 1 table set produces about 10GB of data in non-compressed InnoDB tables (so 100 warehouses with 10 table sets gives about 100GB)."**
 > 
