@@ -24,7 +24,7 @@
 
 </details>
 
-### Тест на стандартных настройках: 10313
+### Тест на стандартных настройках - total number of events: 10313 (среднее - 34 tps)
 
 <details>
 <summary>log</summary>
@@ -362,7 +362,7 @@ Threads fairness:
 </details>
     
     
-### "Минимальная" настройка: 18124
+### "Минимальная" настройка - total number of events: 18124 (среднее - 60 tps)
 
 <details>
 <summary>settings</summary>
@@ -716,7 +716,7 @@ Threads fairness:
 
     
     
-### "Агрессивный" режим: 46120
+### "Агрессивный" режим - total number of events: 46120 (среднее - 153 tps)
 
 <details>
 <summary>settings</summary>
