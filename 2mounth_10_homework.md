@@ -235,3 +235,21 @@ https://stackoverflow.com/questions/43884169/postresql-replication-pg-basebackup
 https://www.8host.com/blog/logicheskaya-replikaciya-postgresql-10-v-ubuntu-18-04/
 https://infostart.ru/1c/articles/691958/	
 https://habr.com/ru/post/173623/	
+
+	
+	--
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO replica_user;
+
+-- 1st
+CREATE PUBLICATION test1;
+ALTER PUBLICATION test1 ADD TABLE test1;
+
+
+-- 2nd
+CREATE PUBLICATION test2;
+ALTER PUBLICATION test2 ADD TABLE test2;
+-- 1st
+CREATE SUBSCRIPTION test2 CONNECTION 'host=10.128.0.11 port=5432 password=12345678 user=replica_user dbname=postgres' PUBLICATION test2;
+-- 2nd
+CREATE SUBSCRIPTION test1 CONNECTION 'host=10.128.0.10 port=5432 password=12345678 user=replica_user dbname=postgres' PUBLICATION test1;
+-- 3rd
