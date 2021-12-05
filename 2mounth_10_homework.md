@@ -228,3 +228,10 @@ wal_level = logical
 pg_hba.conf
 host    replication     replica_user    10.128.0.11/32          md5 (internal ip 2nd)
 host    replication     replica_user    10.128.0.12/32          md5 (internal ip 3rd)
+
+	
+	
+https://stackoverflow.com/questions/43884169/postresql-replication-pg-basebackup-no-pg-hbaconf-entry-for-replication-connecti
+https://www.8host.com/blog/logicheskaya-replikaciya-postgresql-10-v-ubuntu-18-04/
+https://infostart.ru/1c/articles/691958/	
+https://habr.com/ru/post/173623/	
