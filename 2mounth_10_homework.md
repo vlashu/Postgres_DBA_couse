@@ -40,9 +40,9 @@
 
 CREATE ROLE test_user WITH LOGIN;
 
--- Создаем пользователя для репликации
+-- Создаем пользователя для репликации (сразу укажем пароль)
 
-CREATE ROLE replica_user WITH 
+CREATE ROLE replica_user WITH PASSWORD '12345678'
 	LOGIN
 	REPLICATION;
 
