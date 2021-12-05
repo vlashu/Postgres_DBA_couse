@@ -92,6 +92,8 @@ INSERT INTO test1 VALUES (1, 'test1_1', 1),(2, 'test1_2', 1),(3, 'test1_3', 2),(
 INSERT INTO test2 VALUES (1, 'test2_1', 3),(2, 'test2_2', 3),(3, 'test2_3', 4),(4, 'test2_4', 4),(5, 'test2_5', 4);
 ```
 
+Наполнение 1го сервера
+
 ```console
 postgres=# select * from test1
 postgres-# ;
@@ -122,6 +124,55 @@ postgres=# select * from related_obj;
 (4 rows)
 ```
 
+Наполнение 2го сервера (таблица test1 пустая)
+
+```console
+postgres=# select * from test1;
+ id | name | related_obj_id 
+----+------+----------------
+(0 rows)
+
+postgres=# select * from test2;
+ id |  name   | related_obj_id 
+----+---------+----------------
+  1 | test2_1 |              3
+  2 | test2_2 |              3
+  3 | test2_3 |              4
+  4 | test2_4 |              4
+  5 | test2_5 |              4
+(5 rows)
+
+postgres=# select * from related_obj;
+ id | name | obj_value 
+----+------+-----------
+  1 | ro_1 |         1
+  2 | ro_2 |         2
+  3 | ro_3 |         3
+  4 | ro_4 |         4
+(4 rows)
+postgres=# 
+```
+
+Наполнение 3го сервера (test1 и test2 пустые)
+
+```console
+postgres=# select * from test1;
+ id | name | related_obj_id 
+----+------+----------------
+(0 rows)
+postgres=# select * from test2;
+ id | name | related_obj_id 
+----+------+----------------
+(0 rows)
+postgres=# select * from related_obj;
+ id | name | obj_value 
+----+------+-----------
+  1 | ro_1 |         1
+  2 | ro_2 |         2
+  3 | ro_3 |         3
+  4 | ro_4 |         4
+(4 rows)
+```
 <details>
 <summary>Настройка логической репликации</summary>
 	
@@ -129,7 +180,8 @@ postgres=# select * from related_obj;
 <summary>Документация</summary>	
 	
 <details>
-<summary>31.8. Параметры конфигурации </summary>	
+<summary>31.8. Параметры конфигурации </summary>
+	
 (https://postgrespro.ru/docs/postgresql/10/logical-replication-config)
 
 Для осуществления логической репликации необходимо установить несколько параметров конфигурации.
@@ -137,11 +189,12 @@ postgres=# select * from related_obj;
 На публикующем сервере параметр wal_level должен иметь значение logical, а в max_replication_slots должно быть задано число не меньше ожидаемого числа подписчиков плюс некоторый резерв для синхронизации таблиц. А в max_wal_senders должно быть значение как минимум равное max_replication_slots плюс число возможных физических реплик, работающих одновременно.
 
 Также на стороне подписчика необходимо установить параметр max_replication_slots, задающий число источников репликации, которые могут отслеживаться. В данном случае он должен быть не меньше числа подписок, на которые будет подписываться данный подписчик. В max_logical_replication_workers необходимо установить значение не меньше числа подписок плюс некоторый резерв для синхронизации таблиц. Кроме того, может потребоваться изменить max_worker_processes, чтобы это число включало дополнительные рабочие процессы для репликации (как минимум max_logical_replication_workers + 1). Заметьте, что некоторые расширения и параллельные запросы также занимают слоты из числа max_worker_processes.
+	
 </details>
 	
+<details>	
+<summary>31.9. Быстрая настройка</summary>
 	
-<details>
-<summary>31.9. Быстрая настройка</summary>	
 (https://postgrespro.ru/docs/postgresql/10/logical-replication-quick-setup)
 	
 Сначала установите параметры конфигурации в postgresql.conf:
@@ -163,6 +216,11 @@ CREATE PUBLICATION mypub FOR TABLE users, departments;
 CREATE SUBSCRIPTION mysub CONNECTION 'dbname=foo host=bar user=repuser' PUBLICATION mypub;
 
 Показанная выше команда запустит процесс репликации, который вначале синхронизирует исходное содержимого таблиц users и departments, а затем начнёт перенос инкрементальных изменений в этих таблицах.	
+	
 </details>
 
 </details>
+
+postgresql.conf    
+listen_addresses = 'localhost, 10.128.0.10' - local master ip (internal ip)
+wal_level = logical
