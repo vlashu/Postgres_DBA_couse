@@ -224,3 +224,7 @@ CREATE SUBSCRIPTION mysub CONNECTION 'dbname=foo host=bar user=repuser' PUBLICAT
 postgresql.conf    
 listen_addresses = 'localhost, 10.128.0.10' - local master ip (internal ip)
 wal_level = logical
+	
+pg_hba.conf
+host    replication     replica_user    10.128.0.11/32          md5 (internal ip 2nd)
+host    replication     replica_user    10.128.0.12/32          md5 (internal ip 3rd)
