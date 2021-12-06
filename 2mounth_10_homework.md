@@ -238,6 +238,7 @@ https://habr.com/ru/post/173623/
 
 	
 	--
+GRANT ALL PRIVILEGES ON DATABASE postgres TO replica_user;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO replica_user;
 
 -- 1st
@@ -253,3 +254,41 @@ CREATE SUBSCRIPTION test2 CONNECTION 'host=10.128.0.11 port=5432 password=123456
 -- 2nd
 CREATE SUBSCRIPTION test1 CONNECTION 'host=10.128.0.10 port=5432 password=12345678 user=replica_user dbname=postgres' PUBLICATION test1;
 -- 3rd
+
+	
+	
+	
+postgres=# CREATE SUBSCRIPTION test2 CONNECTION 'host=10.128.0.11 port=5432 password=12345678 user=replica_user dbn
+ame=postgres' PUBLICATION test2;
+ERROR:  could not connect to the publisher: connection to server at "10.128.0.11", port 5432 failed: FATAL:  no pg_
+hba.conf entry for replication connection from host "10.128.0.10", user "replica_user", SSL on
+connection to server at "10.128.0.11", port 5432 failed: FATAL:  no pg_hba.conf entry for replication connection fr
+om host "10.128.0.10", user "replica_user", SSL off
+	
+В блоке IPv4 дописываем строку с адресом тест2 (надо будет указать реплика и пользователя)
+# IPv4 local connections:
+host    all             all             127.0.0.1/32            md5
+host    all             all             10.128.0.11/32          md5
+	
+создаем подписку
+	
+postgres=# CREATE SUBSCRIPTION test2 CONNECTION 'host=10.128.0.11 port=5432 password=12345678 user=replica_user dbn
+ame=postgres' PUBLICATION test2;
+NOTICE:  created replication slot "test2" on publisher
+CREATE SUBSCRIPTION
+	
+на тест2 тоже самое, проверяем тест2:
+	
+postgres=# select * from test1;
+ id |  name   | related_obj_id 
+----+---------+----------------
+  1 | test1_1 |              1
+  2 | test1_2 |              1
+  3 | test1_3 |              2
+  4 | test1_4 |              2
+  5 | test1_5 |              3
+(5 rows)
+postgres=# 
+	
+репликация тест2 прошла.
+	
