@@ -318,3 +318,34 @@ postgres=# select * from test2;
   6 | test2_6 |              4
 (6 rows)
 postgres=# 
+
+	
+	
+postgres=# CREATE SUBSCRIPTION test4 CONNECTION 'host=10.128.0.10 port=5432 password=12345678 user=replica_user dbn
+ame=postgres' PUBLICATION test1;
+NOTICE:  created replication slot "test4" on publisher
+CREATE SUBSCRIPTION
+postgres=# CREATE SUBSCRIPTION test5 CONNECTION 'host=10.128.0.11 port=5432 password=12345678 user=replica_user dbn
+ame=postgres' PUBLICATION test2;
+NOTICE:  created replication slot "test5" on publisher
+CREATE SUBSCRIPTION
+postgres=# select * from test1;
+ id |  name   | related_obj_id 
+----+---------+----------------
+  1 | test1_1 |              1
+  2 | test1_2 |              1
+  3 | test1_3 |              2
+  4 | test1_4 |              2
+  5 | test1_5 |              3
+(5 rows)
+postgres=# select * from test2;
+ id |  name   | related_obj_id 
+----+---------+----------------
+  1 | test2_1 |              3
+  2 | test2_2 |              3
+  3 | test2_3 |              4
+  4 | test2_4 |              4
+  5 | test2_5 |              4
+  6 | test2_6 |              4
+(6 rows)
+postgres=# 
