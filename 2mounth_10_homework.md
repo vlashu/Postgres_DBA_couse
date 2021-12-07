@@ -292,3 +292,29 @@ postgres=#
 	
 репликация тест2 прошла.
 	
+Проблема!
+	
+postgres=# select * from test2;                                                                                    
+ id |  name   | related_obj_id 
+----+---------+----------------
+  1 | test2_1 |              3
+  2 | test2_2 |              3
+  3 | test2_3 |              4
+  4 | test2_4 |              4
+  5 | test2_5 |              4
+(5 rows)
+	
+postgres=# truncate test2;
+TRUNCATE TABLE
+	
+postgres=# select * from test2;
+ id |  name   | related_obj_id 
+----+---------+----------------
+  1 | test2_1 |              3
+  2 | test2_2 |              3
+  3 | test2_3 |              4
+  4 | test2_4 |              4
+  5 | test2_5 |              4
+  6 | test2_6 |              4
+(6 rows)
+postgres=# 
