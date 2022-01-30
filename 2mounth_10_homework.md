@@ -218,34 +218,34 @@ CREATE SUBSCRIPTION mysub CONNECTION 'dbname=foo host=bar user=repuser' PUBLICAT
 Показанная выше команда запустит процесс репликации, который вначале синхронизирует исходное содержимого таблиц users и departments, а затем начнёт перенос инкрементальных изменений в этих таблицах.	
 	
 </details>
-
+https://stackoverflow.com/questions/43884169/postresql-replication-pg-basebackup-no-pg-hbaconf-entry-for-replication-connecti
+	
+https://www.8host.com/blog/logicheskaya-replikaciya-postgresql-10-v-ubuntu-18-04/
+	
+https://infostart.ru/1c/articles/691958/
+	
+https://habr.com/ru/post/173623/	
 </details>
-
+	
+```console
 postgresql.conf    
 listen_addresses = 'localhost, 10.128.0.10' - local master ip (internal ip)
 wal_level = logical
+```
 	
+```console
 pg_hba.conf
 host    replication     replica_user    10.128.0.11/32          md5 (internal ip 2nd)
 host    replication     replica_user    10.128.0.12/32          md5 (internal ip 3rd)
-
+```
 	
-	
-https://stackoverflow.com/questions/43884169/postresql-replication-pg-basebackup-no-pg-hbaconf-entry-for-replication-connecti
-https://www.8host.com/blog/logicheskaya-replikaciya-postgresql-10-v-ubuntu-18-04/
-https://infostart.ru/1c/articles/691958/	
-https://habr.com/ru/post/173623/	
-
-	
-	--
+```sql
 GRANT ALL PRIVILEGES ON DATABASE postgres TO replica_user;
 GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO replica_user;
 
 -- 1st
 CREATE PUBLICATION test1;
 ALTER PUBLICATION test1 ADD TABLE test1;
-
-
 -- 2nd
 CREATE PUBLICATION test2;
 ALTER PUBLICATION test2 ADD TABLE test2;
@@ -254,31 +254,31 @@ CREATE SUBSCRIPTION test2 CONNECTION 'host=10.128.0.11 port=5432 password=123456
 -- 2nd
 CREATE SUBSCRIPTION test1 CONNECTION 'host=10.128.0.10 port=5432 password=12345678 user=replica_user dbname=postgres' PUBLICATION test1;
 -- 3rd
-
-	
-	
-	
-postgres=# CREATE SUBSCRIPTION test2 CONNECTION 'host=10.128.0.11 port=5432 password=12345678 user=replica_user dbn
-ame=postgres' PUBLICATION test2;
+postgres=# CREATE SUBSCRIPTION test2 CONNECTION 'host=10.128.0.11 port=5432 password=12345678 user=replica_user dbname=postgres' PUBLICATION test2;
+```
+```console	
 ERROR:  could not connect to the publisher: connection to server at "10.128.0.11", port 5432 failed: FATAL:  no pg_
 hba.conf entry for replication connection from host "10.128.0.10", user "replica_user", SSL on
 connection to server at "10.128.0.11", port 5432 failed: FATAL:  no pg_hba.conf entry for replication connection fr
 om host "10.128.0.10", user "replica_user", SSL off
+```
 	
 В блоке IPv4 дописываем строку с адресом тест2 (надо будет указать реплика и пользователя)
+```console
 # IPv4 local connections:
 host    all             all             127.0.0.1/32            md5
 host    all             all             10.128.0.11/32          md5
-	
+```
 создаем подписку
 	
-postgres=# CREATE SUBSCRIPTION test2 CONNECTION 'host=10.128.0.11 port=5432 password=12345678 user=replica_user dbn
-ame=postgres' PUBLICATION test2;
+```console
+postgres=# CREATE SUBSCRIPTION test2 CONNECTION 'host=10.128.0.11 port=5432 password=12345678 user=replica_user dbname=postgres' PUBLICATION test2;
 NOTICE:  created replication slot "test2" on publisher
 CREATE SUBSCRIPTION
-	
+```
 на тест2 тоже самое, проверяем тест2:
 	
+```console	
 postgres=# select * from test1;
  id |  name   | related_obj_id 
 ----+---------+----------------
@@ -289,11 +289,11 @@ postgres=# select * from test1;
   5 | test1_5 |              3
 (5 rows)
 postgres=# 
-	
+```
 репликация тест2 прошла.
 	
 Проблема!
-	
+```console		
 postgres=# select * from test2;                                                                                    
  id |  name   | related_obj_id 
 ----+---------+----------------
@@ -318,17 +318,16 @@ postgres=# select * from test2;
   6 | test2_6 |              4
 (6 rows)
 postgres=# 
-
+```
 	
-	
-postgres=# CREATE SUBSCRIPTION test4 CONNECTION 'host=10.128.0.10 port=5432 password=12345678 user=replica_user dbn
-ame=postgres' PUBLICATION test1;
+```console		
+postgres=# CREATE SUBSCRIPTION test4 CONNECTION 'host=10.128.0.10 port=5432 password=12345678 user=replica_user dbname=postgres' PUBLICATION test1;
 NOTICE:  created replication slot "test4" on publisher
 CREATE SUBSCRIPTION
-postgres=# CREATE SUBSCRIPTION test5 CONNECTION 'host=10.128.0.11 port=5432 password=12345678 user=replica_user dbn
-ame=postgres' PUBLICATION test2;
+postgres=# CREATE SUBSCRIPTION test5 CONNECTION 'host=10.128.0.11 port=5432 password=12345678 user=replica_user dbname=postgres' PUBLICATION test2;
 NOTICE:  created replication slot "test5" on publisher
 CREATE SUBSCRIPTION
+	
 postgres=# select * from test1;
  id |  name   | related_obj_id 
 ----+---------+----------------
@@ -349,7 +348,7 @@ postgres=# select * from test2;
   6 | test2_6 |              4
 (6 rows)
 postgres=# 
-
+```
 	
 	
 Значение replication показывает, что запись соответствует, если запрашивается подключение для физической репликации (имейте в виду, что для таких подключений не выбирается какая-то конкретная база данных)
